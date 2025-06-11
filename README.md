@@ -1,66 +1,57 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Teste técnico - Backend Cartões 
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
 
-## About Laravel
+Análise da aplicação da **VExpenses**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Integração
+ - Estou certo que é proposital, mas ao pingar https://api.banking.com.br/ não encontrou o host, o que deu ruim pra fazer as requisições da **camada de integração**.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## UseCases
+- **Construtor com parâmetros:**  
+    Sugestão de passar os parâmetros diretamente no construtor (SOLID).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Padronização de nomes:**  
+    No `Login`, renomearia o nome da classe `create_token` para `CreateToken`, inclusive no nome do arquivo.
 
-## Learning Laravel
+- **Transações:**  
+    Quando a persistência atinge mais de uma tabela, usar `DB::transaction()` evita inconsistências em caso de erro.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Services/Repositories:**  
+    Se os métodos crescerem em complexidade é interessante tratar numa camada de **Service** em vez de ser direto no **Repository**.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Comentário incorreto:**  
+    O comentário da Login::handler() não condiz com o que o método faz.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Rotas públicas:**  
+    Usaria prefix('auth') nas rotas públicas de `login` e `register`.
 
-## Laravel Sponsors
+ - **Validações reutilizáveis:**  
+    Criar uma camada de `Validators` para evitar duplicação, como no `validateUser()`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+- **SRP no CreateFirstUser:**  
+    Em `User/CreateFirstUser`, existe mais de uma responsabilidade. Mas, sendo que o objetivo dele é criar um usuário **completo** isso envolve outras ações.
 
-### Premium Partners
+## Domains
+- **Enums:**  
+    Em `User/Create` e `User/Update`, seria interessante usar as constantes com ENUM.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+- **Domínio Account:**  
+    Criaria um domínio **Account** para centralizar validações e evitar duplicação, como no caso de `updateStatus` e `updateDatabase`
 
-## Contributing
+- **Validações no Update da Empresa:**  
+    Em `Company/Update`, adicionar:
+    - Verificação de existência da empresa
+    - Validação do nome
+    - Validação do número de documento
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Controller
+- No `UserController`, escolheria usar `camelCase` nos parâmetros do `CreateFirstUserParams()`.
 
-## Code of Conduct
+## Repositories
+- Em `User/Retrieve`, o valor inserido pelo usuário é concatenado dentro da string SQL sem `bindings`. Existe a possibilidade de ocorrer um **SQL Injection**.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Requests   
+- Em `User/CreateRequest` e `User/RegisterRequest`, poderia ser usado regras mais seguras e coesas para os parametros.
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Testes
+- Em `Feature/Company/UpdateTest`, o `"update name"` está falhando pois exite um erro no `find()` do método `update` do `CompanyController`.
