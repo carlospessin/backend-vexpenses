@@ -1,7 +1,7 @@
-# Teste técnico - Backend Cartões 
+# Desafio técnico da **VExpenses**
 
 
-Análise da aplicação da **VExpenses**
+Processo seletivo | Desenvolvimento back-end
 
 ## Integração
  - Estou certo que é proposital, mas ao pingar https://api.banking.com.br/ não encontrou o host, o que deu ruim pra fazer as requisições da **camada de integração**.
